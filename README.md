@@ -77,27 +77,12 @@ No predictive modeling is performed. The emphasis is on exploratory analysis and
 ## How to Run
 
 1. Clone this repository.
-
 2. Install required packages:
-
-```bash
-pip install -r requirements.txt
-
 3. (Optional but recommended) Create and activate a virtual environment:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate   # Mac/Linux
-# .venv\Scripts\activate    # Windows
-
 4. Open the project in Jupyter:
-
-```bash
-jupyter notebook
-
 5. Navigate to the `notebooks/` directory and run:
-- `00_setup.ipynb` (data loading and initial sanity checks)
-- Followed by exploratory notebooks for analysis and visualization
+    - `00_setup.ipynb` (data loading and initial sanity checks)
+    - Followed by exploratory notebooks for analysis and visualization
 
 ---
 
