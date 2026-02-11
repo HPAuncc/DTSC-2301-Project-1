@@ -1,0 +1,21 @@
+# Data (keep raw data out unless required/allowed)
+data/raw/*
+data/processed/*
+
+# Allow empty folders to exist in git via placeholder files
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# macOS
+.DS_Store
+
