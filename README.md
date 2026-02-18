@@ -45,6 +45,13 @@ Each row represents a single NFL game.
 
 For this project, the analysis focuses on **regular season games from 2000 through 2023**.
 
+### Analysis Sample Size
+
+- Raw table: 7,276 games (1999-2025)
+- After season filter (2000-2023): 6,447 games
+- Final regular-season analysis set: 6,175 games across 24 seasons
+- Ties in analysis set: 14 games (0.23%)
+
 ---
 
 ## Project Objectives
@@ -69,6 +76,9 @@ The project workflow includes:
 - Aggregating win rates by season
 - Visualizing trends using `matplotlib` and `seaborn`
 - Interpreting patterns within historical and league context
+
+Key decision: a 5-year rolling average is used to show long-run trend signal.  
+2-year and 3-year windows were tested but remained noisier; 7-year smoothing was slightly smoother but less responsive to meaningful shifts.
 
 No predictive modeling is performed. The emphasis is on exploratory analysis and thoughtful interpretation.
 
@@ -107,3 +117,5 @@ This project is part of DTSC-2301 and emphasizes process, reasoning, and communi
 
 The analysis intentionally prioritizes interpretation, transparency, and reflection. Conclusions drawn from the data are discussed with appropriate caution, acknowledging uncertainty, assumptions, and contextual factors that may influence observed trends.
 
+For a fuller narrative (sample-size details, cleaning decisions, and interpretation), see:
+`/Users/hampton/Development/UNCC/DTSC-2301/Project-1/docs/project_writeup.md`
