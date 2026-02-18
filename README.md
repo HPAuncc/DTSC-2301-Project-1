@@ -1,121 +1,148 @@
-# DTSC-2301-Project-1
-Exploratory data science project focused on problem definition, data cleaning, visualization, and interpretation for DTSC-2301 (Data Science Foundations).
+# DTSC-2301 Project 1
+## Home-Field Advantage in the NFL (2000-2023)
 
-# Home-Field Advantage in the NFL (2000–2023)
+### Course
+DTSC-2301 Data Science Foundations, UNC Charlotte
 
-## Course  
-**DTSC-2301 — Data Science Foundations**  
-University of North Carolina at Charlotte  
+## 1) Problem Definition
+### Research question
+To what extent does home-field advantage influence NFL game outcomes, and how has that effect changed from 2000-2023?
 
----
+### Why this question matters
+Home-field advantage is one of the most common claims in sports analytics, but its magnitude may shift over time due to league, travel, and game-environment changes. This question is relevant to analysts, fans, and anyone making data-based sports claims.
 
-## Project Overview
+### Scope
+This project is exploratory analysis, not prediction.
 
-This project investigates the research question:
+## 2) Data Description and Understanding
+### Data source
+- Source: nflverse `games.csv`
+- URL: https://github.com/nflverse/nfldata/raw/master/data/games.csv
 
-> **To what extent does home-field advantage influence NFL game outcomes, and how has its impact changed from 2000–2023?**
+### What each row represents
+Each row is one NFL game.
 
-Rather than building a predictive model, this analysis focuses on:
+### Key variables used
+- `season`
+- `game_type`
+- `home_score`
+- `away_score`
+- `game_id`
 
-- Defining a clear, well-scoped exploratory question  
-- Cleaning and preparing real-world game-level data  
-- Using visualization to identify trends and patterns  
-- Interpreting findings while acknowledging limitations and uncertainty  
+### Sample size
+- Raw file: 7,276 games (1999-2025)
+- After filtering to 2000-2023: 6,447 games
+- Final analysis sample (regular season only): 6,175 games across 24 seasons
+- Average games per season: 257.3 (range 248-272)
+- Ties: 14 games (0.23%)
 
-The goal is to understand whether playing at home meaningfully affects win probability and whether that effect has strengthened, weakened, or remained stable over time.
+### What the data does not directly capture
+The dataset does not directly include attendance intensity, detailed travel burden, injuries, or team/coaching quality controls. Those missing factors matter for causal interpretation.
 
----
+## 3) Cleaning and Preparation Decisions
+### Decision A: Restrict to seasons 2000-2023
+Why: long enough for trend analysis while staying focused on the modern NFL era.
 
-## Dataset
+Tradeoff: excludes older historical context and avoids potential incomplete-latest-season effects.
 
-**Source:** nflverse — Game-Level Data (1999–present)  
-**CSV File:**  
-https://github.com/nflverse/nfldata/raw/master/data/games.csv  
+### Decision B: Focus main claims on regular season
+Why: regular season gives stable year-to-year comparability and large sample size.
 
-The dataset contains detailed game-level information for NFL games, including:
+Important note: playoff rows are labeled `WC`, `DIV`, `CON`, and `SB` (not `POST`), so the current postseason export logic produces an empty file. Final claims are therefore anchored to the clean regular-season sample.
 
-- Season and week  
-- Home and away teams  
-- Final scores  
-- Game location  
-- Playoff indicators  
-- Additional contextual variables  
+### Decision C: Coerce scores to numeric and drop invalid rows
+- Converted `home_score` and `away_score` with `errors="coerce"`
+- Dropped rows missing either score
 
-Each row represents a single NFL game.
+Why: ensures win/loss and margin calculations are valid.
 
-For this project, the analysis focuses on **regular season games from 2000 through 2023**.
+Result: 0 rows removed from the regular-season sample, but this remains an important integrity check.
 
-### Analysis Sample Size
+### Decision D: Encode wins and ties explicitly
+- `home_win = 1` if home score > away score
+- `home_win = 0` if home score < away score
+- `home_win = NaN` for ties
+- Separate `home_tie` indicator
 
-- Raw table: 7,276 games (1999-2025)
-- After season filter (2000-2023): 6,447 games
-- Final regular-season analysis set: 6,175 games across 24 seasons
-- Ties in analysis set: 14 games (0.23%)
+Why: ties should not be incorrectly treated as losses.
 
----
+### Decision E: Validate one row per game
+`game_id.nunique() == len(df_reg)` (6,175 = 6,175), confirming unique game rows.
 
-## Project Objectives
+## 4) Data Understanding and Visualization
+### Visual 1: Home win rate by season
+![Home win rate by season](./visuals/home_win_trend.png)
 
-This project aims to:
+### Visual 2: Home win rate with rolling trend
+![Home win rate with 5-year rolling average](./visuals/rolling_avg.png)
 
-1. Quantify overall home win percentage.
-2. Analyze trends in home-field advantage over time.
-3. Compare regular season vs playoff home advantage.
-4. Identify seasons where home advantage strengthened or declined.
-5. Reflect on structural changes in the league (rule changes, travel patterns, crowd effects, COVID seasons).
+### Visual 3: Home scoring margin distribution
+![Distribution of home margin](./visuals/margin_distribution.png)
 
----
+### Why these visuals
+- Seasonal trend line shows year-to-year movement.
+- Rolling trend line separates medium-term signal from seasonal noise.
+- Margin distribution adds context beyond binary win/loss outcomes.
 
-## Methods
+### Why a 5-year rolling average (not 2- or 3-year)?
+I used 5-year smoothing because 2- and 3-year windows were still too volatile for stable trend interpretation.
 
-The project workflow includes:
+Observed smoothness (mean absolute year-to-year change in the smoothed series):
+- 2-year: 0.0147
+- 3-year: 0.0112
+- 5-year: 0.0051
+- 7-year: 0.0050
 
-- Data cleaning and filtering (2000–2023 seasons)
-- Handling missing or incomplete records
-- Creating derived variables (e.g., home win indicator)
-- Aggregating win rates by season
-- Visualizing trends using `matplotlib` and `seaborn`
-- Interpreting patterns within historical and league context
+Interpretation: 5-year preserves meaningful shifts (including the 2020 disruption) while reducing short-run noise. A 7-year window adds little extra smoothing but can over-smooth changes.
 
-Key decision: a 5-year rolling average is used to show long-run trend signal.  
-2-year and 3-year windows were tested but remained noisier; 7-year smoothing was slightly smoother but less responsive to meaningful shifts.
+## 5) Storytelling and Interpretation
+### Core finding
+Home teams won 56.26% of regular-season games in this sample, indicating a persistent home-field advantage.
 
-No predictive modeling is performed. The emphasis is on exploratory analysis and thoughtful interpretation.
+### Trend finding
+Home-field advantage appears weaker than in the early 2000s.
 
----
+- Highest season: 2003 at 61.33%
+- Lowest season: 2020 at 49.80%
+- 2000-2008 average: 57.03%
+- 2015-2023 average: 54.84%
+- Difference: about -2.19 percentage points
 
-## How to Run
+### Margin context
+Mean home score = 23.17, mean away score = 20.94, so average home margin is about +2.23 points.
 
-1. Clone this repository.
-2. Install required packages:
-3. (Optional but recommended) Create and activate a virtual environment:
-4. Open the project in Jupyter:
-5. Navigate to the `notebooks/` directory and run:
-    - `00_setup.ipynb` (data loading and initial sanity checks)
-    - Followed by exploratory notebooks for analysis and visualization
+### Interpretation statement
+The data supports a narrower claim: home-field advantage has not disappeared, but its magnitude appears to have narrowed over time, with a strong disruption around 2020 and partial rebound afterward.
 
----
+## 6) Limitations, Assumptions, and Reflection
+### Limits
+This is descriptive analysis, not causal inference.
 
-## Key Focus Areas
+### Key limitations
+- No controls for team strength, QB quality, injuries, or coaching.
+- No direct attendance variable.
+- Neutral/international game context not separately modeled.
+- Postseason comparison not included in final claims due game-type label mismatch in current pipeline.
 
-- Exploratory Data Analysis (EDA)
-- Visualization-driven reasoning
-- Clear communication of insights
-- Discussion of limitations and ethical considerations
-- Transparency in data sources and assumptions
+### Assumptions
+- `game_id` uniquely identifies games.
+- Score fields are valid after coercion and missing-value filtering.
+- Seasonal aggregation is appropriate for this league-level trend question.
 
----
+### Reflection
+Small percentage-point changes can still matter at league scale, but conclusions must be constrained by uncertainty and omitted variables.
+
+## 7) References and Transparency
+### Data reference
+- nflverse `games.csv`: https://github.com/nflverse/nfldata/raw/master/data/games.csv
+
+### Tooling transparency
+- Analysis performed in Python using pandas, matplotlib, and seaborn.
+- Decisions in preprocessing and smoothing are explicitly justified to keep the workflow auditable.
+
+## Repository Notes
+- Primary analysis notebooks: `notebooks/00_setup.ipynb`, `notebooks/01_home_field_eda.ipynb`, `notebooks/02_interpretation.ipynb`
+- Supplemental long-form write-up: `docs/project_writeup.md`
 
 ## License
-
 This repository is licensed under the MIT License.
-
-
-## Notes
-
-This project is part of DTSC-2301 and emphasizes process, reasoning, and communication over prediction accuracy. The goal is to demonstrate thoughtful analytical judgment and clear storytelling using real-world sports data.
-
-The analysis intentionally prioritizes interpretation, transparency, and reflection. Conclusions drawn from the data are discussed with appropriate caution, acknowledging uncertainty, assumptions, and contextual factors that may influence observed trends.
-
-For a fuller narrative (sample-size details, cleaning decisions, and interpretation), see:
-`/Users/hampton/Development/UNCC/DTSC-2301/Project-1/docs/project_writeup.md`
